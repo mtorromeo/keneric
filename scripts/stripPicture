@@ -7,25 +7,15 @@ exportPicture="$3"
 
 # thumbnail options by mime type
 case "$mime" in
-
       model/stl)
-      echo  "import (\"$fullname\");" > $exportPicture.scad
-      openscad --viewall --imgsize=256,256 -o $exportPicture.png $exportPicture.scad
-      mv $exportPicture.png $exportPicture
-      rm $exportPicture.scad
-      exit
+            stl-thumb -s 256 "$fullname" "$exportPicture"
       ;;
 
       application/sla)
-      echo  "import (\"$fullname\");" > $exportPicture.scad
-      openscad --viewall --imgsize=256,256 -o $exportPicture.png $exportPicture.scad
-      mv $exportPicture.png $exportPicture
-      rm $exportPicture.scad
-      exit
+            echo  "import (\"$fullname\");" > "$exportPicture.scad"
+            openscad --viewall --imgsize=256,256 -o "$exportPicture.png" "$exportPicture.scad"
+            mv "$exportPicture.png" "$exportPicture"
+            rm "$exportPicture.scad"
+            exit
       ;;
-
-      *)
-#     case trap
-      exit
-
 esac
