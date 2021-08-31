@@ -16,6 +16,7 @@
 
 #include "keneric.h"
 
+#include <QLoggingCategory>
 #include <QDir>
 #include <QFile>
 #include <QImage>
@@ -25,6 +26,8 @@
 #include <QStandardPaths>
 #include <QCryptographicHash>
 
+Q_LOGGING_CATEGORY(LOG_KENERIC, "com.keneric")
+
 extern "C"
 {
     Q_DECL_EXPORT ThumbCreator *new_creator()
@@ -33,13 +36,9 @@ extern "C"
     }
 }
 
-Keneric::Keneric()
-{
-}
+Keneric::Keneric() = default;
 
-Keneric::~Keneric()
-{
-}
+Keneric::~Keneric() = default;
 
 bool Keneric::create(const QString& path, int /*width*/, int /*heigth*/, QImage& img)
 {
@@ -71,9 +70,4 @@ bool Keneric::create(const QString& path, int /*width*/, int /*heigth*/, QImage&
     }
 
     return !img.isNull();
-}
-
-ThumbCreator::Flags Keneric::flags() const
-{
-    return (Flags)(None);
 }

@@ -17,18 +17,17 @@
 #ifndef KENERIC_THUMBNAILER_H
 #define KENERIC_THUMBNAILER_H
 
-#include <QObject>
-#include <kio/thumbcreator.h>
+#include <KIO/ThumbCreator>
 
+#include <QLoggingCategory>
+Q_DECLARE_LOGGING_CATEGORY(LOG_KENERIC)
 
-class Keneric : public QObject, public ThumbCreator
+class Keneric : public ThumbCreator
 {
-    Q_OBJECT
-public:
-    Keneric();
-    virtual ~Keneric();
-    virtual bool create(const QString& path, int width, int height, QImage& img);
-    virtual Flags flags() const;
+    public:
+        Keneric();
+        ~Keneric();
+        bool create(const QString& path, int width, int height, QImage& img);
 };
 
 #endif
