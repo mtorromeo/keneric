@@ -1,0 +1,17 @@
+#!/bin/sh -e
+# Usage: keneric fullname mime exportPicture
+
+fullname="$1"
+mime="$2"
+exportPicture="$3"
+
+# thumbnail options by mime type
+case "$mime" in
+      model/stl)
+            stl-thumb -s 256 "$fullname" "$exportPicture"
+      ;;
+
+      application/sla)
+            echo "import (\"$fullname\");" | openscad --viewall --imgsize=256,256 -o "$exportPicture" -
+      ;;
+esac

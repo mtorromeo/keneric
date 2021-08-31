@@ -48,32 +48,32 @@ bool Keneric::create(const QString& path, int /*width*/, int /*heigth*/, QImage&
 
     QString kenericDirectory((QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation) + "/keneric/"));
     QString md5Hash = QString(QCryptographicHash::hash((path.toUtf8()),QCryptographicHash::Md5).toHex());
-    QString protoThumbnail(kenericDirectory + md5Hash);
-    
+    QString protoThumbnail(kenericDirectory + md5Hash + ".png");
+
     QDir directory(kenericDirectory);
     if (!directory.exists()) {
         directory.mkpath(".");
     }
 
     QObject *parent = 0;
-    QString program="stripPicture";
+    QString program = "keneric";
     QStringList arguments;
     arguments << path << mime.name() << protoThumbnail;
     QProcess *startAction = new QProcess(parent);
     startAction->start(program, arguments);
     startAction->waitForFinished();
-    
+
     QFile thumbnailFile(protoThumbnail);
     if (thumbnailFile.exists()){
         QImage previewImage(protoThumbnail);
         img = previewImage.scaled(256, 256, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QFile::remove(protoThumbnail);
     }
-    
+
     return !img.isNull();
 }
 
 ThumbCreator::Flags Keneric::flags() const
-{    
+{
     return (Flags)(None);
 }
