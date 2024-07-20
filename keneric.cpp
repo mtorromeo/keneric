@@ -25,37 +25,35 @@
 #include <QMimeDatabase>
 #include <QStandardPaths>
 #include <QCryptographicHash>
+#include <KPluginFactory>
 
 Q_LOGGING_CATEGORY(LOG_KENERIC, "com.keneric")
 
-extern "C"
-{
-    Q_DECL_EXPORT ThumbCreator *new_creator()
-    {
-        return new Keneric();
-    }
-}
-
-Keneric::Keneric() = default;
+K_PLUGIN_CLASS_WITH_JSON(Keneric, "keneric.json")
+Keneric::Keneric(QObject *parent, const QVariantList &args)
+    : KIO::ThumbnailCreator(parent, args) {};
 
 Keneric::~Keneric() = default;
 
-bool Keneric::create(const QString& path, int /*width*/, int /*heigth*/, QImage& img)
+KIO::ThumbnailResult Keneric::create(const KIO::ThumbnailRequest &request)
 {
+    const QString path = request.url().toLocalFile();
+
+    QImage img;
     QMimeDatabase db;
     QMimeType mime = db.mimeTypeForFile(path);
 
-    QString kenericDirectory((QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation) + "/keneric/"));
-    QString md5Hash = QString(QCryptographicHash::hash((path.toUtf8()),QCryptographicHash::Md5).toHex());
-    QString protoThumbnail(kenericDirectory + md5Hash + ".png");
+    QString kenericDirectory((QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation) + QString::fromUtf8("/keneric/")));
+    QString md5Hash = QString::fromUtf8(QCryptographicHash::hash((path.toUtf8()),QCryptographicHash::Md5).toHex());
+    QString protoThumbnail(kenericDirectory + md5Hash + QString::fromUtf8(".png"));
 
     QDir directory(kenericDirectory);
     if (!directory.exists()) {
-        directory.mkpath(".");
+        directory.mkpath(QString::fromUtf8("."));
     }
 
-    QObject *parent = 0;
-    QString program = "keneric";
+    QObject *parent = NULL;
+    QString program = QString::fromUtf8("keneric");
     QStringList arguments;
     arguments << path << mime.name() << protoThumbnail;
     QProcess *startAction = new QProcess(parent);
@@ -65,9 +63,15 @@ bool Keneric::create(const QString& path, int /*width*/, int /*heigth*/, QImage&
     QFile thumbnailFile(protoThumbnail);
     if (thumbnailFile.exists()){
         QImage previewImage(protoThumbnail);
-        img = previewImage.scaled(256, 256, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        img = previewImage.scaled(request.targetSize().width(), request.targetSize().height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QFile::remove(protoThumbnail);
     }
 
-    return !img.isNull();
+    if (!img.isNull()) {
+        return KIO::ThumbnailResult::pass(img);
+    }
+
+    return KIO::ThumbnailResult::fail();
 }
+
+#include "keneric.moc"

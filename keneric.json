@@ -1,0 +1,11 @@
+{
+    "CacheThumbnail": true,
+    "KPlugin": {
+        "MimeTypes": [
+            "model/x.stl-ascii",
+            "model/stl"
+        ],
+        "Name": "STL files"
+    },
+    "MimeType": "model/stl;model/x.stl-ascii;"
+}

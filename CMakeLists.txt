@@ -1,35 +1,52 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 
 project(keneric
   DESCRIPTION "keneric script based thumbnail generator for KDE")
 
-set(QT_MIN_VERSION "5.3.0")
-set(KF5_MIN_VERSION "5.2.0")
+set(QT_MIN_VERSION "5.15.0")
+set(KF6_MIN_VERSION "5.92.0")
 
-find_package(ECM 1.0.0 REQUIRED NO_MODULE)
-set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+if (QT_MAJOR_VERSION STREQUAL "6")
+    set(QT_REQUIRED_VERSION "6.5.0")
+    set(KF_MIN_VERSION "5.240.0")
+endif()
+
+find_package(ECM ${KF_MIN_VERSION} REQUIRED NO_MODULE)
+set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH}  ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings NO_POLICY_SCOPE)
 include(FeatureSummary)
-include(WriteBasicConfigVersionFile)
+include(ECMQtDeclareLoggingCategory)
+include(ECMDeprecationSettings)
 
-find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS Gui)
-find_package(KF5 REQUIRED COMPONENTS KIO)
+find_package(Qt${QT_MAJOR_VERSION} ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS Core Gui)
+find_package(KF${QT_MAJOR_VERSION} ${KF_MIN_VERSION} REQUIRED COMPONENTS KIO)
+
+set(KDE_COMPILERSETTINGS_LEVEL "5.82.0")
+ecm_set_disabled_deprecation_versions(QT 5.15.2
+  KF 5.81
+)
+
+kcoreaddons_add_plugin(keneric SOURCES keneric.cpp INSTALL_NAMESPACE "kf${QT_MAJOR_VERSION}/thumbcreator")
+
+target_link_libraries(keneric
+  Qt::Core
+  Qt::Gui
+  KF${QT_MAJOR_VERSION}::KIOWidgets
+  KF${QT_MAJOR_VERSION}::KIOCore
+)
+
+ecm_qt_declare_logging_category(keneric
+  HEADER keneric_debug.h
+  IDENTIFIER KENERIC_DEBUG
+  CATEGORY_NAME keneric
+  DESCRIPTION "keneric thumbnail generator"
+  EXPORT PLASMAWORKSPACE
+)
+
+
+install(PROGRAMS scripts/keneric DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)
-
-include_directories(
-    ${CMAKE_CURRENT_BINARY_DIR}
-    )
-
-set(keneric_PART_SRCS keneric.cpp)
-
-add_library(keneric MODULE ${keneric_PART_SRCS})
-
-target_link_libraries(keneric Qt5::Gui KF5::KIOWidgets)
-
-install(TARGETS keneric DESTINATION ${PLUGIN_INSTALL_DIR})
-install(PROGRAMS scripts/keneric DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES desktop/kenericstl.desktop desktop/kenericstlb.desktop DESTINATION ${SERVICES_INSTALL_DIR})

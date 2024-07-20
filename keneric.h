@@ -17,17 +17,17 @@
 #ifndef KENERIC_THUMBNAILER_H
 #define KENERIC_THUMBNAILER_H
 
-#include <KIO/ThumbCreator>
+#include <KIO/ThumbnailCreator>
+#include <QObject>
 
-#include <QLoggingCategory>
-Q_DECLARE_LOGGING_CATEGORY(LOG_KENERIC)
-
-class Keneric : public ThumbCreator
+class Keneric : public KIO::ThumbnailCreator
 {
-    public:
-        Keneric();
-        ~Keneric();
-        bool create(const QString& path, int width, int height, QImage& img);
+    Q_OBJECT
+
+public:
+    explicit Keneric(QObject *parent, const QVariantList &args);
+    ~Keneric() override;
+    KIO::ThumbnailResult create(const KIO::ThumbnailRequest &request) override;
 };
 
 #endif
