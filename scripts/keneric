@@ -7,11 +7,11 @@ exportPicture="$3"
 
 # thumbnail options by mime type
 case "$mime" in
-      model/stl)
+      model/stl | model/x.stl-ascii | application/sla)
             stl-thumb -s 256 "$fullname" "$exportPicture"
       ;;
 
-      application/sla)
-            echo "import (\"$fullname\");" | openscad --viewall --imgsize=256,256 -o "$exportPicture" -
+      application/x-openscad)
+            openscad --viewall --imgsize=256,256 --colorscheme Starnight --export-format png -o - "$fullname" | convert - -transparent black "$exportPicture"
       ;;
 esac
