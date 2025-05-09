@@ -3,13 +3,8 @@ cmake_minimum_required(VERSION 3.16)
 project(keneric
   DESCRIPTION "keneric script based thumbnail generator for KDE")
 
-set(QT_MIN_VERSION "5.15.0")
-set(KF6_MIN_VERSION "5.92.0")
-
-if (QT_MAJOR_VERSION STREQUAL "6")
-    set(QT_REQUIRED_VERSION "6.5.0")
-    set(KF_MIN_VERSION "5.240.0")
-endif()
+set(QT_REQUIRED_VERSION "6.5.0")
+set(KF_MIN_VERSION "6.0.0")
 
 find_package(ECM ${KF_MIN_VERSION} REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH}  ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -24,10 +19,8 @@ include(ECMDeprecationSettings)
 find_package(Qt${QT_MAJOR_VERSION} ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS Core Gui)
 find_package(KF${QT_MAJOR_VERSION} ${KF_MIN_VERSION} REQUIRED COMPONENTS KIO)
 
-set(KDE_COMPILERSETTINGS_LEVEL "5.82.0")
-ecm_set_disabled_deprecation_versions(QT 5.15.2
-  KF 5.81
-)
+set(KDE_COMPILERSETTINGS_LEVEL "6.0")
+ecm_set_disabled_deprecation_versions(QT 6.5.0 KF 6.0.0)
 
 kcoreaddons_add_plugin(keneric SOURCES keneric.cpp INSTALL_NAMESPACE "kf${QT_MAJOR_VERSION}/thumbcreator")
 
